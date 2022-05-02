@@ -121,22 +121,24 @@ export default class Board extends React.Component {
                                 state.numbers[m_row][col] = state.numbers[m_row + 1][col];
                                 state.numbers[m_row + 1][col] = tempNum;
                             }
-                            state.numbers[Constants.boardDimension - 1][col] = 0;
+                            if (row < Constants.boardDimension - 1) {
+                                state.numbers[Constants.boardDimension - 1][col] = 0;
+                            }
                             moved = true;
                         }
                     }
                     for (row = 1; row < Constants.boardDimension; row++) {
-                        if (state.numbers[row - 1][col] === 0 && state.numbers[row][col] !== 0) {
+                        if (state.numbers[[row - 1]][col] === state.numbers[row][col] && state.numbers[row][col] !== 0) {
+                            state.numbers[row - 1][col] *= 2;
+                            state.numbers[row][col] = 0;
                             for (let m_row = row; m_row < Constants.boardDimension - 1; m_row++) {
                                 let tempNum = state.numbers[m_row][col];
                                 state.numbers[m_row][col] = state.numbers[m_row + 1][col];
                                 state.numbers[m_row + 1][col] = tempNum;
                             }
-                            state.numbers[Constants.boardDimension - 1][col] = 0;
-                            moved = true;
-                        } else if (state.numbers[[row - 1]][col] === state.numbers[row][col] && state.numbers[row][col] !== 0) {
-                            state.numbers[row - 1][col] *= 2;
-                            state.numbers[row][col] = 0;
+                            if (row < Constants.boardDimension - 1) {
+                                state.numbers[Constants.boardDimension - 1][col] = 0;
+                            }
                             moved = true;
                         }
                     }
@@ -153,22 +155,24 @@ export default class Board extends React.Component {
                                 state.numbers[m_row][col] = state.numbers[m_row - 1][col];
                                 state.numbers[m_row - 1][col] = tempNum;
                             }
-                            state.numbers[0][col] = 0;
+                            if (row > 0) {
+                                state.numbers[0][col] = 0;
+                            }
                             moved = true;
                         }
                     }
                     for (row = Constants.boardDimension - 2; row >= 0; row--) {
-                        if (state.numbers[row + 1][col] === 0 && state.numbers[row][col] !== 0) {
-                            for (let m_row = row + 1; m_row > 0; m_row--) {
+                        if (state.numbers[row + 1][col] === state.numbers[row][col] && state.numbers[row][col] !== 0) {
+                            state.numbers[row + 1][col] *= 2;
+                            state.numbers[row][col] = 0;
+                            for (let m_row = row; m_row > 0; m_row--) {
                                 let tempNum = state.numbers[m_row][col];
                                 state.numbers[m_row][col] = state.numbers[m_row - 1][col];
                                 state.numbers[m_row - 1][col] = tempNum;
                             }
-                            state.numbers[0][col] = 0;
-                            moved = true;
-                        } else if (state.numbers[row + 1][col] === state.numbers[row][col] && state.numbers[row][col] !== 0) {
-                            state.numbers[row + 1][col] *= 2;
-                            state.numbers[row][col] = 0;
+                            if (row > 1) {
+                                state.numbers[0][col] = 0;
+                            }
                             moved = true;
                         }
                     }
@@ -186,13 +190,11 @@ export default class Board extends React.Component {
                         }
                     }
                     for (col = 1; col < Constants.boardDimension; col++) {
-                        if (state.numbers[row][col - 1] === 0 && state.numbers[row][col] !== 0) {
-                            state.numbers[row].splice(col - 1, 1);
-                            state.numbers[row].push(0);
-                            moved = true;
-                        } else if (state.numbers[row][col - 1] === state.numbers[row][col] && state.numbers[row][col] !== 0) {
+                        if (state.numbers[row][col - 1] === state.numbers[row][col] && state.numbers[row][col] !== 0) {
                             state.numbers[row][col - 1] *= 2;
                             state.numbers[row][col] = 0;
+                            state.numbers[row].splice(col, 1);
+                            state.numbers[row].push(0);
                             moved = true;
                         }
                     }
@@ -211,20 +213,11 @@ export default class Board extends React.Component {
                         }
                     }
                     for (col = Constants.boardDimension - 2; col >= 0; col--) {
-                        if (state.numbers[row][col + 1] === 0 && state.numbers[row][col] !== 0) {
-                            state.numbers[row].splice(col + 1, 1);
-                            state.numbers[row].unshift(0);
-                            moved = true;
-                        } else if (state.numbers[row][col + 1] === state.numbers[row][col] && state.numbers[row][col] !== 0) {
+                        if (state.numbers[row][col + 1] === state.numbers[row][col] && state.numbers[row][col] !== 0) {
                             state.numbers[row][col + 1] *= 2;
                             state.numbers[row][col] = 0;
-                            moved = true;
-                        }
-                    }
-                    for (col = 0; col < Constants.boardDimension - 1; col++) {
-                        if (state.numbers[row][col + 1] === 0 && state.numbers[row][col] !== 0) {
-                            state.numbers[row][col + 1] = state.numbers[row][col];
-                            state.numbers[row][col] = 0;
+                            state.numbers[row].splice(col, 1);
+                            state.numbers[row].unshift(0);
                             moved = true;
                         }
                     }
