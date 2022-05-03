@@ -131,6 +131,7 @@ export default class Board extends React.Component {
                         if (state.numbers[[row - 1]][col] === state.numbers[row][col] && state.numbers[row][col] !== 0) {
                             state.numbers[row - 1][col] *= 2;
                             state.numbers[row][col] = 0;
+                            state.currentScore += state.numbers[row - 1][col];
                             for (let m_row = row; m_row < Constants.boardDimension - 1; m_row++) {
                                 let tempNum = state.numbers[m_row][col];
                                 state.numbers[m_row][col] = state.numbers[m_row + 1][col];
@@ -165,6 +166,7 @@ export default class Board extends React.Component {
                         if (state.numbers[row + 1][col] === state.numbers[row][col] && state.numbers[row][col] !== 0) {
                             state.numbers[row + 1][col] *= 2;
                             state.numbers[row][col] = 0;
+                            state.currentScore += state.numbers[row + 1][col];
                             for (let m_row = row; m_row > 0; m_row--) {
                                 let tempNum = state.numbers[m_row][col];
                                 state.numbers[m_row][col] = state.numbers[m_row - 1][col];
@@ -192,7 +194,8 @@ export default class Board extends React.Component {
                     for (col = 1; col < Constants.boardDimension; col++) {
                         if (state.numbers[row][col - 1] === state.numbers[row][col] && state.numbers[row][col] !== 0) {
                             state.numbers[row][col - 1] *= 2;
-                            state.numbers[row][col] = 0;
+                            state.numbers[row][col] = 0;                            
+                            state.currentScore += state.numbers[row][col - 1];
                             state.numbers[row].splice(col, 1);
                             state.numbers[row].push(0);
                             moved = true;
@@ -215,7 +218,8 @@ export default class Board extends React.Component {
                     for (col = Constants.boardDimension - 2; col >= 0; col--) {
                         if (state.numbers[row][col + 1] === state.numbers[row][col] && state.numbers[row][col] !== 0) {
                             state.numbers[row][col + 1] *= 2;
-                            state.numbers[row][col] = 0;
+                            state.numbers[row][col] = 0;   
+                            state.currentScore += state.numbers[row][col + 1];
                             state.numbers[row].splice(col, 1);
                             state.numbers[row].unshift(0);
                             moved = true;
@@ -227,6 +231,9 @@ export default class Board extends React.Component {
 
         if (moved) {
             state.numbers = this.addRandomNumber(state.numbers);
+        }
+        if (state.currentScore > state.bestScore) {
+            state.bestScore = state.currentScore;
         }
         this.setState(state);
     }
