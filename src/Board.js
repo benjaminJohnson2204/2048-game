@@ -9,6 +9,13 @@ class Direction {
     static RIGHT = 3;
 }
 
+class GameState {
+    static DEFAULT = 0;
+    static SHOWING_2048 = 1;
+    static ACHIEVED_2048 = 2;
+    static LOST = 3;
+}
+
 export default class Board extends React.Component {
     upPressed = false;
     downPressed = false;
@@ -20,7 +27,8 @@ export default class Board extends React.Component {
         this.state = {
             numbers : this.getInitialNumbers(),
             currentScore : 0,
-            bestScore : 0
+            bestScore : 0,
+            gameState : GameState.DEFAULT
         };
 
         document.addEventListener("keydown", (e) => {
@@ -104,11 +112,15 @@ export default class Board extends React.Component {
         game.setState({
             numbers : this.getInitialNumbers(),
             currentScore : 0,
-            bestScore : this.state.bestScore
+            bestScore : this.state.bestScore,
+            gameState : GameState.DEFAULT
         });
     }
 
     handleKeyPress(state, direction) {
+        if (state.gameState === GameState.SHOWING_2048 || state.gameState === GameState.LOST) {
+            return;
+        }
         let moved = false; // Whether any number has moved
         switch (direction) {
             case Direction.UP:
@@ -236,6 +248,35 @@ export default class Board extends React.Component {
             state.bestScore = state.currentScore;
         }
         this.setState(state);
+        this.checkWinLoss(state);
+    }
+
+    checkWinLoss(state) {
+        let lost = true;
+        for (let row = 0; row < Constants.boardDimension; row++) {
+            for (let col = 0; col < Constants.boardDimension; col++) {
+                let currentNum = state.numbers[row][col];
+                if (state.gameState === GameState.DEFAULT && currentNum === 2048) {
+                    state.gameState = GameState.SHOWING_2048;
+                }
+                if (lost && (
+                    currentNum === 0 ||
+                    (row < Constants.boardDimension - 1 && state.numbers[row + 1][col] === currentNum) ||
+                    (col < Constants.boardDimension - 1 && state.numbers[row][col + 1] === currentNum)
+                )) {
+                    lost = false;
+                }
+            }
+        }
+        if (lost) {
+            state.gameState = GameState.LOST;
+        }
+        this.setState(state);
+    }
+
+    exitAchieving2048(state) {
+        state.gameState = GameState.ACHIEVED_2048;
+        this.setState(state);
     }
 
     render() {
@@ -245,6 +286,17 @@ export default class Board extends React.Component {
                 Score: {this.state.currentScore}
                 <p></p>
                 Best: {this.state.bestScore}
+                <p></p>
+                {(this.state.gameState === GameState.DEFAULT || this.state.gameState === GameState.ACHIEVED_2048) ? null :
+                    (this.state.gameState === GameState.LOST ? "Game Over" :
+                    (<div>
+                        Congratulations on achieving 2048!
+                        <p></p>
+                        <button onClick={() => this.exitAchieving2048(this.state)}>
+                            Keep Going
+                        </button>
+                    </div>))
+                }
                 <p></p>
                 <button onClick={() => this.restartGame(this)}>
                     New Game
